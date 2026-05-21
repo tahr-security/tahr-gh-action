@@ -1,0 +1,49 @@
+name: Tahr Assessment Trigger
+description: Trigger a Tahr CI/CD assessment for an application.
+branding:
+  icon: shield
+  color: purple
+
+inputs:
+  api-url:
+    description: Base Tahr API URL, for example https://api.tahr.one.
+    required: false
+    default: https://api.tahr.one
+  application-id:
+    description: Tahr application id.
+    required: true
+  trigger-token:
+    description: Tahr CI/CD trigger token generated from application settings.
+    required: true
+  assessment-type:
+    description: Tahr assessment type key to trigger.
+    required: false
+    default: source_code_analysis
+  reserved-ip-id:
+    description: Optional Tahr reserved scanner IP id.
+    required: false
+    default: ''
+
+outputs:
+  assessment-id:
+    description: Queued Tahr assessment id.
+    value: ${{ steps.trigger.outputs.assessment-id }}
+  assessment-type:
+    description: Tahr assessment type accepted by the API.
+    value: ${{ steps.trigger.outputs.assessment-type }}
+  status:
+    description: Queue status returned by Tahr.
+    value: ${{ steps.trigger.outputs.status }}
+
+runs:
+  using: composite
+  steps:
+    - id: trigger
+      shell: bash
+      env:
+        TAHR_API_URL: ${{ inputs.api-url }}
+        TAHR_APPLICATION_ID: ${{ inputs.application-id }}
+        TAHR_TRIGGER_TOKEN: ${{ inputs.trigger-token }}
+        TAHR_ASSESSMENT_TYPE: ${{ inputs.assessment-type }}
+        TAHR_RESERVED_IP_ID: ${{ inputs.reserved-ip-id }}
+      run: bash "${{ github.action_path }}/scripts/tahr-trigger.sh"

@@ -1,0 +1,99 @@
+name: Release tag
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - action.yml
+      - README.md
+      - scripts/**
+  workflow_dispatch:
+    inputs:
+      floating_tag:
+        description: "Floating tag to move, e.g. v1"
+        required: true
+        default: "v1"
+      target_tag:
+        description: "Exact release tag, e.g. v1.2.3. Leave empty to auto-bump patch."
+        required: false
+
+concurrency:
+  group: release-tag
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  release-tag:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Require main branch
+        if: ${{ github.ref != 'refs/heads/main' }}
+        run: |
+          echo "This workflow can only run from the main branch."
+          exit 1
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Create exact tag, publish release, and move floating tag
+        env:
+          FLOATING_TAG: ${{ inputs.floating_tag || 'v1' }}
+          TARGET_TAG: ${{ inputs.target_tag || '' }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+
+          git fetch --tags origin
+
+          git check-ref-format "refs/tags/${FLOATING_TAG}"
+
+          if [ -z "${TARGET_TAG}" ]; then
+            latest_tag="$(git tag -l "${FLOATING_TAG}.*" --sort=-v:refname | head -n 1)"
+            if [ -z "${latest_tag}" ]; then
+              TARGET_TAG="${FLOATING_TAG}.0.0"
+            elif [[ "${latest_tag}" =~ ^${FLOATING_TAG}\.([0-9]+)\.([0-9]+)$ ]]; then
+              TARGET_TAG="${FLOATING_TAG}.${BASH_REMATCH[1]}.$((BASH_REMATCH[2] + 1))"
+            else
+              echo "Latest tag ${latest_tag} does not match expected ${FLOATING_TAG}.x.y format."
+              exit 1
+            fi
+          fi
+
+          git check-ref-format "refs/tags/${TARGET_TAG}"
+
+          if [ "${FLOATING_TAG}" = "${TARGET_TAG}" ]; then
+            echo "floating_tag and target_tag must be different."
+            exit 1
+          fi
+
+          if git rev-parse --verify --quiet "refs/tags/${TARGET_TAG}" >/dev/null; then
+            target_sha="$(git rev-list -n 1 "refs/tags/${TARGET_TAG}")"
+          else
+            target_sha="${GITHUB_SHA}"
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          if ! git rev-parse --verify --quiet "refs/tags/${TARGET_TAG}" >/dev/null; then
+            git tag "${TARGET_TAG}" "${target_sha}"
+            git push origin "refs/tags/${TARGET_TAG}"
+          fi
+
+          if gh release view "${TARGET_TAG}" >/dev/null 2>&1; then
+            echo "Release ${TARGET_TAG} already exists."
+          else
+            gh release create "${TARGET_TAG}" \
+              --title "${TARGET_TAG}" \
+              --generate-notes \
+              --verify-tag
+          fi
+
+          git tag -f "${FLOATING_TAG}" "${target_sha}"
+          git push origin -f "refs/tags/${FLOATING_TAG}"
