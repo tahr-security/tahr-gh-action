@@ -8,7 +8,7 @@ This action queues an assessment through the Tahr application CI/CD trigger endp
 
 ```yaml
 - name: Tahr Assessment Trigger
-  uses: yack-security/tahr-gh-action@v1
+  uses: tahr-security/tahr-gh-action@v1
 ```
 
 ```yaml
@@ -31,7 +31,7 @@ jobs:
 
       - name: Trigger Tahr assessment
         id: tahr
-        uses: yack-security/tahr-gh-action@v1
+        uses: tahr-security/tahr-gh-action@v1
         with:
           application-id: ${{ vars.TAHR_APPLICATION_ID }}
           trigger-token: ${{ secrets.TAHR_TRIGGER_TOKEN }}
