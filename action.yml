@@ -1,4 +1,4 @@
-name: Tahr Assessment Trigger
+name: tahr-github-action
 description: Trigger a Tahr CI/CD assessment for an application.
 branding:
   icon: shield
