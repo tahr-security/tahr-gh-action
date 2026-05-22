@@ -59,7 +59,7 @@ run_success() {
   PATH="$TMP_DIR/bin:$PATH" \
   MOCK_CAPTURE="$TMP_DIR" \
   GITHUB_OUTPUT="$output_file" \
-  TAHR_API_URL="https://api.tahr.one/" \
+  TAHR_API_URL="https://run.app.tahr.one/" \
   TAHR_APPLICATION_ID="app_123" \
   TAHR_TRIGGER_TOKEN="secret-token" \
   TAHR_ASSESSMENT_TYPE="source_code_analysis" \
@@ -69,7 +69,7 @@ run_success() {
   grep -q 'assessment-id=assessment_123' "$output_file"
   grep -q 'assessment-type=source_code_analysis' "$output_file"
   grep -q 'status=queued' "$output_file"
-  grep -q 'https://api.tahr.one/integrations/applications/app_123/start' "$TMP_DIR/url.txt"
+  grep -q 'https://run.app.tahr.one/integrations/applications/app_123/start' "$TMP_DIR/url.txt"
   grep -q '{"assessmentType":"source_code_analysis"}' "$TMP_DIR/body.json"
 }
 
@@ -79,7 +79,7 @@ run_reserved_ip_success() {
   PATH="$TMP_DIR/bin:$PATH" \
   MOCK_CAPTURE="$TMP_DIR" \
   GITHUB_OUTPUT="$output_file" \
-  TAHR_API_URL="https://api.tahr.one" \
+  TAHR_API_URL="https://run.app.tahr.one" \
   TAHR_APPLICATION_ID="app_123" \
   TAHR_TRIGGER_TOKEN="secret-token" \
   TAHR_ASSESSMENT_TYPE="full-no-authz" \
@@ -97,7 +97,7 @@ run_failure() {
     MOCK_HTTP_CODE="401" \
     MOCK_RESPONSE='{"success":false,"error":"Unauthorized"}' \
     GITHUB_OUTPUT="$output_file" \
-    TAHR_API_URL="https://api.tahr.one" \
+    TAHR_API_URL="https://run.app.tahr.one" \
     TAHR_APPLICATION_ID="app_123" \
     TAHR_TRIGGER_TOKEN="bad-token" \
     TAHR_ASSESSMENT_TYPE="full" \
@@ -117,7 +117,7 @@ run_message_failure() {
     MOCK_HTTP_CODE="403" \
     MOCK_RESPONSE='{"success":false,"message":"Assessment type is not allowed"}' \
     GITHUB_OUTPUT="$output_file" \
-    TAHR_API_URL="https://api.tahr.one" \
+    TAHR_API_URL="https://run.app.tahr.one" \
     TAHR_APPLICATION_ID="app_123" \
     TAHR_TRIGGER_TOKEN="secret-token" \
     TAHR_ASSESSMENT_TYPE="full" \
@@ -135,9 +135,9 @@ run_network_failure() {
   if PATH="$TMP_DIR/bin:$PATH" \
     MOCK_CAPTURE="$TMP_DIR" \
     MOCK_CURL_EXIT="6" \
-    MOCK_CURL_ERROR="curl: (6) Could not resolve host: api.tahr.one" \
+    MOCK_CURL_ERROR="curl: (6) Could not resolve host: run.app.tahr.one" \
     GITHUB_OUTPUT="$output_file" \
-    TAHR_API_URL="https://api.tahr.one" \
+    TAHR_API_URL="https://run.app.tahr.one" \
     TAHR_APPLICATION_ID="app_123" \
     TAHR_TRIGGER_TOKEN="secret-token" \
     TAHR_ASSESSMENT_TYPE="full" \
@@ -146,7 +146,7 @@ run_network_failure() {
     echo "expected failure for curl network error" >&2
     exit 1
   fi
-  grep -q 'Tahr trigger request failed: curl: (6) Could not resolve host: api.tahr.one' /tmp/tahr-action-network-failure.log
+  grep -q 'Tahr trigger request failed: curl: (6) Could not resolve host: run.app.tahr.one' /tmp/tahr-action-network-failure.log
 }
 
 run_success

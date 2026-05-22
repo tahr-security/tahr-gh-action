@@ -6,9 +6,9 @@ branding:
 
 inputs:
   api-url:
-    description: Base Tahr API URL, for example https://api.tahr.one.
+    description: Tahr Convex run host, for example https://run.app.tahr.one.
     required: false
-    default: https://api.tahr.one
+    default: https://run.app.tahr.one
   application-id:
     description: Tahr application id.
     required: true

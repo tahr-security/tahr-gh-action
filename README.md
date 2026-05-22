@@ -43,13 +43,13 @@ jobs:
 
 ## Inputs
 
-| Name              | Required | Default                | Description                                                                                        |
-| ----------------- | -------- | ---------------------- | -------------------------------------------------------------------------------------------------- |
-| `api-url`         | No       | `https://api.tahr.one` | Tahr API base URL.                                                                                 |
-| `application-id`  | Yes      |                        | Tahr application id.                                                                               |
-| `trigger-token`   | Yes      |                        | CI/CD trigger token generated in Tahr application settings. Store this as a Github Actions secret. |
-| `assessment-type` | No       | `source_code_analysis` | Assessment type key enabled for CI/CD in Tahr.                                                     |
-| `reserved-ip-id`  | No       |                        | Optional reserved scanner IP id.                                                                   |
+| Name              | Required | Default                    | Description                                                                                        |
+| ----------------- | -------- | -------------------------- | -------------------------------------------------------------------------------------------------- |
+| `api-url`         | No       | `https://run.app.tahr.one` | Tahr Convex run host.                                                                              |
+| `application-id`  | Yes      |                            | Tahr application id.                                                                               |
+| `trigger-token`   | Yes      |                            | CI/CD trigger token generated in Tahr application settings. Store this as a Github Actions secret. |
+| `assessment-type` | No       | `source_code_analysis`     | Assessment type key enabled for CI/CD in Tahr.                                                     |
+| `reserved-ip-id`  | No       |                            | Optional reserved scanner IP id.                                                                   |
 
 ## Allowed assessment types
 
@@ -81,6 +81,8 @@ These default keys can be used when they are published and allowed for CI/CD in 
 6. Make sure the selected assessment type is published and allowed for CI/CD in Tahr.
 
 If an assessment type is not allowed for CI/CD, the action fails with `Unsupported assessment type`.
+
+The CI/CD trigger endpoint is served from `https://run.app.tahr.one`. Using `https://api.tahr.one` for this action returns HTTP 404.
 
 ## Security notes
 
